@@ -51,7 +51,7 @@ npx tsx prisma/seed.ts
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) (or port 3001 if 3000 is occupied) in your browser.
+Open [http://localhost:3000](http://localhost:3001) (or port 3001 if 3000 is occupied) in your browser.
 
 ---
 
