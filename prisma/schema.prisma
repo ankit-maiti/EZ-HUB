@@ -1,0 +1,86 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String            @id @default(cuid())
+  name        String
+  email       String            @unique
+  role        String            // "MANAGER" | "EMPLOYEE"
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  requests    Request[]         @relation("AssignedRequests")
+  followUps   FollowUp[]
+  activities  RequestActivity[]
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  requests  Request[]
+}
+
+model Request {
+  id            String            @id @default(cuid())
+  clientId      String
+  client        Client            @relation(fields: [clientId], references: [id])
+  title         String
+  description   String
+  source        String            // "WHATSAPP" | "EMAIL" | "OTHER"
+  priority      String            // "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+  status        String            // "NEW" | "NEEDS_CLARIFICATION" | "READY_TO_ASSIGN" | "IN_PROGRESS" | "WAITING_ON_CLIENT" | "DONE"
+  assigneeId    String?
+  assignee      User?             @relation("AssignedRequests", fields: [assigneeId], references: [id])
+  dueAt         DateTime?
+  waitingReason String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  activities    RequestActivity[]
+  followUps     FollowUp[]
+
+  @@index([status])
+  @@index([assigneeId])
+  @@index([clientId])
+  @@index([dueAt])
+}
+
+model RequestActivity {
+  id        String   @id @default(cuid())
+  requestId String
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  type      String   // "CREATED" | "STATUS_CHANGED" | "ASSIGNED" | "UNASSIGNED" | "PRIORITY_CHANGED" | "CLARIFICATION_REQUESTED" | "CLIENT_RESPONSE" | "FOLLOW_UP_CREATED" | "FOLLOW_UP_COMPLETED" | "NOTE_ADDED" | "COMPLETED"
+  message   String
+  metadata  String?  // JSON stringified additional context
+  createdAt DateTime @default(now())
+
+  @@index([requestId])
+}
+
+model FollowUp {
+  id          String    @id @default(cuid())
+  requestId   String
+  request     Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id])
+  scheduledAt DateTime
+  note        String
+  status      String    @default("UPCOMING") // "UPCOMING" | "DUE" | "MISSED" | "COMPLETED"
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([requestId])
+  @@index([ownerId])
+  @@index([scheduledAt])
+}
