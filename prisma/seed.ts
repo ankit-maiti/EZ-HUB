@@ -14,32 +14,40 @@ async function main() {
   console.log('Creating users...');
   const manager = await prisma.user.create({
     data: {
-      name: 'Priya Sharma',
-      email: 'priya.sharma@lalatech.internal',
+      name: 'Ankit Maiti',
+      email: 'ankit.maiti@lalatech.internal',
       role: 'MANAGER',
     },
   });
 
   const employee1 = await prisma.user.create({
     data: {
-      name: 'Aman Patel',
-      email: 'aman.patel@lalatech.internal',
+      name: 'Udhvab Roy Chaudhury',
+      email: 'udhvab.chaudhury@lalatech.internal',
       role: 'EMPLOYEE',
     },
   });
 
   const employee2 = await prisma.user.create({
     data: {
-      name: 'Rohan Mehta',
-      email: 'rohan.mehta@lalatech.internal',
+      name: 'Mondrita Ghosh',
+      email: 'mondrita.ghosh@lalatech.internal',
       role: 'EMPLOYEE',
     },
   });
 
   const employee3 = await prisma.user.create({
     data: {
-      name: 'Sneha Rao',
-      email: 'sneha.rao@lalatech.internal',
+      name: 'Ayushka Sen',
+      email: 'ayushka.sen@lalatech.internal',
+      role: 'EMPLOYEE',
+    },
+  });
+
+  const employee4 = await prisma.user.create({
+    data: {
+      name: 'Abhishek Bardhan',
+      email: 'abhishek.bardhan@lalatech.internal',
       role: 'EMPLOYEE',
     },
   });
@@ -101,14 +109,14 @@ async function main() {
         requestId: reqWaitingOnClient.id,
         actorId: manager.id,
         type: 'CREATED',
-        message: 'Request captured from WhatsApp chat by Priya Sharma',
+        message: 'Request captured from WhatsApp chat by Ankit Maiti',
         createdAt: subDays(new Date(), 5),
       },
       {
         requestId: reqWaitingOnClient.id,
         actorId: manager.id,
         type: 'ASSIGNED',
-        message: 'Assigned to Aman Patel by Priya Sharma',
+        message: 'Assigned to Udhvab Roy Chaudhury by Ankit Maiti',
         createdAt: subDays(new Date(), 4),
       },
       {
@@ -159,14 +167,14 @@ async function main() {
         requestId: reqOverdue.id,
         actorId: manager.id,
         type: 'CREATED',
-        message: 'Urgent email ticket captured from shipments@globallogistics.io',
+        message: 'Urgent email ticket captured from shipments@globallogistics.io by Ankit Maiti',
         createdAt: subDays(new Date(), 4),
       },
       {
         requestId: reqOverdue.id,
         actorId: manager.id,
         type: 'ASSIGNED',
-        message: 'Assigned to Rohan Mehta',
+        message: 'Assigned to Mondrita Ghosh',
         createdAt: subDays(new Date(), 3),
       },
       {
@@ -186,7 +194,6 @@ async function main() {
     ],
   });
 
-  // Follow-up on overdue ticket that is MISSED (scheduled yesterday)
   await prisma.followUp.create({
     data: {
       requestId: reqOverdue.id,
@@ -218,7 +225,7 @@ async function main() {
         requestId: reqNeedsClarification.id,
         actorId: manager.id,
         type: 'CREATED',
-        message: 'Logged from WhatsApp voice memo by Priya Sharma',
+        message: 'Logged from WhatsApp voice memo by Ankit Maiti',
         createdAt: subHours(new Date(), 10),
       },
       {
@@ -252,7 +259,7 @@ async function main() {
         requestId: reqReadyToAssign.id,
         actorId: manager.id,
         type: 'CREATED',
-        message: 'Request logged from procurement email',
+        message: 'Request logged from procurement email by Ankit Maiti',
         createdAt: subHours(new Date(), 5),
       },
       {
@@ -265,7 +272,7 @@ async function main() {
     ],
   });
 
-  // 5. In Progress with Follow-up DUE TODAY
+  // 5. In Progress with Follow-up DUE TODAY (Assigned to Abhishek Bardhan)
   const reqInProgressDueToday = await prisma.request.create({
     data: {
       clientId: clientAcme.id,
@@ -274,7 +281,7 @@ async function main() {
       source: 'OTHER',
       priority: 'MEDIUM',
       status: 'IN_PROGRESS',
-      assigneeId: employee1.id,
+      assigneeId: employee4.id,
       dueAt: addDays(new Date(), 1),
       createdAt: subDays(new Date(), 2),
     },
@@ -286,19 +293,19 @@ async function main() {
         requestId: reqInProgressDueToday.id,
         actorId: manager.id,
         type: 'CREATED',
-        message: 'Ticket created by Priya Sharma',
+        message: 'Ticket created by Ankit Maiti',
         createdAt: subDays(new Date(), 2),
       },
       {
         requestId: reqInProgressDueToday.id,
         actorId: manager.id,
         type: 'ASSIGNED',
-        message: 'Assigned to Aman Patel',
+        message: 'Assigned to Abhishek Bardhan',
         createdAt: subDays(new Date(), 2),
       },
       {
         requestId: reqInProgressDueToday.id,
-        actorId: employee1.id,
+        actorId: employee4.id,
         type: 'STATUS_CHANGED',
         message: 'Status changed to In Progress',
         createdAt: subDays(new Date(), 1),
@@ -309,14 +316,14 @@ async function main() {
   await prisma.followUp.create({
     data: {
       requestId: reqInProgressDueToday.id,
-      ownerId: employee1.id,
+      ownerId: employee4.id,
       scheduledAt: new Date(), // Today!
       note: 'Verify certificate revocation list ping test with Acme infrastructure team',
       status: 'DUE',
     },
   });
 
-  // 6. Completed Request with full history
+  // 6. Completed Request with full history (Assigned to Ayushka Sen)
   const reqDone = await prisma.request.create({
     data: {
       clientId: clientNova.id,
@@ -344,7 +351,7 @@ async function main() {
         requestId: reqDone.id,
         actorId: manager.id,
         type: 'ASSIGNED',
-        message: 'Assigned to Sneha Rao',
+        message: 'Assigned to Ayushka Sen',
         createdAt: subDays(new Date(), 6),
       },
       {
@@ -382,7 +389,7 @@ async function main() {
     },
   });
 
-  console.log('Database seeded successfully with Lala Tech operations data!');
+  console.log('Database seeded successfully with Lala Tech operations data for Ankit Maiti and team!');
 }
 
 main()

@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const data: UserItem[] = await res.json();
           setUsers(data);
 
-          // Restore saved user or default to Manager (Priya Sharma)
+          // Restore saved user or default to Manager (Ankit Maiti)
           const savedId = localStorage.getItem('ez_hub_current_user_id');
           const matched = data.find((u) => u.id === savedId);
           if (matched) {
